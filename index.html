@@ -2,46 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vishak Beauty Salon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   background: #fff;
+  color: #333;
 }
 
 header {
-  background: #f7c1d9;
-  padding: 20px;
+  background: linear-gradient(to right, #e91e63, #f48fb1);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.hero {
+  background: url("images/hero.jpg") center/cover no-repeat;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-box {
+  background: rgba(255,255,255,0.9);
+  padding: 30px;
+  border-radius: 15px;
   text-align: center;
 }
 
 section {
-  padding: 30px;
+  padding: 50px 20px;
 }
 
-.btn {
+.services {
+  background: #f9f9f9;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 20px;
+}
+
+.service-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.service-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.service-card h3 {
+  margin: 0;
+  padding: 15px;
   background: #e91e63;
   color: white;
-  padding: 10px 15px;
+}
+
+.booking {
+  background: linear-gradient(to bottom, #fff0f6, #ffffff);
+}
+
+.booking-form {
+  max-width: 650px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 15px;
+}
+
+button {
+  background: #e91e63;
+  color: white;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .slot {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 5px 0;
+  display: flex;
+  gap: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.slot img {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .available {
-  background: #d4edda;
+  background: #e8f5e9;
 }
 
 .booked {
-  background: #f8d7da;
+  background: #fdecea;
+}
+
+footer {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 15px;
 }
 </style>
 </head>
@@ -53,28 +136,62 @@ section {
   <p>📞 9207836696 | ⏰ 8 AM – 8 PM (Wed–Mon)</p>
 </header>
 
-<section>
-  <h2>Book Appointment</h2>
-
-  <label>Name</label><br>
-  <input id="name"><br><br>
-
-  <label>Phone</label><br>
-  <input id="phone"><br><br>
-
-  <label>Service</label><br>
-  <select id="service">
-    <option value="30">Haircut / Beard (30 mins)</option>
-    <option value="120">Facial (2 hours)</option>
-  </select><br><br>
-
-  <label>Date</label><br>
-  <input type="date" id="date"><br><br>
-
-  <button class="btn" onclick="showSlots()">Show Available Slots</button>
+<section class="hero">
+  <div class="hero-box">
+    <h2>Enhance Your Natural Beauty</h2>
+    <p>Premium care • Professional experts • Elegant results</p>
+  </div>
 </section>
 
-<section id="slots"></section>
+<section class="services">
+  <h2 style="text-align:center">Our Services</h2>
+
+  <div class="service-grid">
+    <div class="service-card">
+      <img src="images/salon1.jpg">
+      <h3>Haircut & Beard (30 mins)</h3>
+    </div>
+
+    <div class="service-card">
+      <img src="images/facial.jpg">
+      <h3>Facials & Skin Care (2 hours)</h3>
+    </div>
+
+    <div class="service-card">
+      <img src="images/bridal.jpg">
+      <h3>Bridal Makeup</h3>
+    </div>
+  </div>
+</section>
+
+<section class="booking">
+  <h2 style="text-align:center">Book Your Appointment</h2>
+
+  <div class="booking-form">
+    <label>Name</label>
+    <input id="name">
+
+    <label>Phone</label>
+    <input id="phone">
+
+    <label>Service</label>
+    <select id="service">
+      <option value="hair">Haircut / Beard</option>
+      <option value="facial">Facial</option>
+    </select>
+
+    <label>Date</label>
+    <input type="date" id="date">
+
+    <button onclick="showSlots()">Show Available Slots</button>
+
+    <div id="slots"></div>
+  </div>
+</section>
+
+<footer>
+  © 2026 Vishak Beauty Salon
+</footer>
 
 <script>
 const START = 8;
@@ -82,8 +199,14 @@ const END = 20;
 const PROFESSIONALS = 6;
 
 function showSlots() {
-  const slotDiv = document.getElementById("slots");
-  slotDiv.innerHTML = "<h3>Available Slots</h3>";
+  const slots = document.getElementById("slots");
+  slots.innerHTML = "";
+
+  const service = document.getElementById("service").value;
+  const img =
+    service === "facial"
+      ? "images/facial.jpg"
+      : "images/salon2.jpg";
 
   for (let hour = START; hour < END; hour++) {
     for (let p = 1; p <= PROFESSIONALS; p++) {
@@ -95,33 +218,37 @@ function showSlots() {
       div.className = "slot " + (booked ? "booked" : "available");
 
       if (booked) {
-        div.innerHTML = `⛔ Booked | ID: ${slotId}`;
+        div.innerHTML = `
+          <img src="${img}">
+          <div>
+            ⛔ Booked<br>
+            Booking ID: <b>${slotId}</b>
+          </div>`;
       } else {
         div.innerHTML = `
-          ✅ ${hour}:00 – ${hour + 1}:00 | Professional ${p}<br>
-          <button class="btn" onclick="bookSlot('${slotId}')">Book</button>
-        `;
+          <img src="${img}">
+          <div>
+            ✅ ${hour}:00 – ${hour + 1}:00<br>
+            Professional ${p}<br>
+            <button onclick="book('${slotId}')">Book</button>
+          </div>`;
       }
 
-      slotDiv.appendChild(div);
+      slots.appendChild(div);
     }
   }
 }
 
-function bookSlot(slotId) {
+function book(slotId) {
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
 
   if (!name || !phone) {
-    alert("Please enter name and phone number");
+    alert("Please enter name and phone");
     return;
   }
 
-  localStorage.setItem(slotId, JSON.stringify({
-    name: name,
-    phone: phone
-  }));
-
+  localStorage.setItem(slotId, JSON.stringify({ name, phone }));
   alert("Booking Confirmed!\nYour Booking ID: " + slotId);
   showSlots();
 }
