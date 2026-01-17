@@ -4,65 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vishak Beauty Salon</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+header {
+  background: #f7c1d9;
+  padding: 20px;
+  text-align: center;
+}
+
+section {
+  padding: 30px;
+}
+
+.btn {
+  background: #e91e63;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+}
+
+.slot {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.available {
+  background: #d4edda;
+}
+
+.booked {
+  background: #f8d7da;
+}
+</style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header class="header">
-<h1>Vishak Beauty Salon</h1>
-<p>Beauty • Bridal • Care</p>
+<header>
+  <h1>Vishak Beauty Salon</h1>
+  <p>📞 9207836696 | ⏰ 8 AM – 8 PM (Wed–Mon)</p>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-<div class="hero-text">
-<h2>Enhance Your Natural Beauty</h2>
-<p>Professional beauty services with care & elegance</p>
-<a href="#services" class="btn">Our Services</a>
-</div>
+<section>
+  <h2>Book Appointment</h2>
+
+  <label>Name</label><br>
+  <input id="name"><br><br>
+
+  <label>Phone</label><br>
+  <input id="phone"><br><br>
+
+  <label>Service</label><br>
+  <select id="service">
+    <option value="30">Haircut / Beard (30 mins)</option>
+    <option value="120">Facial (2 hours)</option>
+  </select><br><br>
+
+  <label>Date</label><br>
+  <input type="date" id="date"><br><br>
+
+  <button class="btn" onclick="showSlots()">Show Available Slots</button>
 </section>
 
-<!-- ABOUT -->
-<section class="about">
-<h2>About Us</h2>
-<p>
-Vishak Beauty Salon offers premium beauty and bridal services
-using high-quality products and experienced professionals.
-</p>
-<img src="images/salon1.jpg" alt="Salon Interior">
-</section>
+<section id="slots"></section>
 
-<!-- SERVICES -->
-<section class="services" id="services">
-<h2>Our Services</h2>
-<div class="service-grid">
-<div class="service">
-<img src="images/bridal.jpg">
-<h3>Bridal Makeup</h3>
-</div>
-<div class="service">
-<img src="images/facial.jpg">
-<h3>Facials & Skin Care</h3>
-</div>
-<div class="service">
-<img src="images/salon2.jpg">
-<h3>Hair Styling</h3>
-</div>
-</div>
-</section>
+<script>
+const START = 8;
+const END = 20;
+const PROFESSIONALS = 6;
 
-<!-- CONTACT -->
-<section class="contact">
-<h2>Contact Us</h2>
-<p>📍 Your City, Kerala</p>
-<p>📞 +91 9XXXXXXXXX</p>
-</section>
+function showSlots() {
+  const slotDiv = document.getElementById("slots");
+  slotDiv.innerHTML = "<h3>Available Slots</h3>";
 
-<!-- FOOTER -->
-<footer>
-<p>© 2026 Vishak Beauty Salon</p>
-</footer>
+  for (let hour = START; hour < END; hour++) {
+    for (let p = 1; p <= PROFESSIONALS; p++) {
+
+      const slotId = hour + "-" + p;
+      const booked = localStorage.getItem(slotId);
+
+      const div = document.createElement("div");
+      div.className = "slot " + (booked ? "booked" : "available");
+
+      if (booked) {
+        div.innerHTML = `⛔ Booked | ID: ${slotId}`;
+      } else {
+        div.innerHTML = `
+          ✅ ${hour}:00 – ${hour + 1}:00 | Professional ${p}<br>
+          <button class="btn" onclick="bookSlot('${slotId}')">Book</button>
+        `;
+      }
+
+      slotDiv.appendChild(div);
+    }
+  }
+}
+
+function bookSlot(slotId) {
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+
+  if (!name || !phone) {
+    alert("Please enter name and phone number");
+    return;
+  }
+
+  localStorage.setItem(slotId, JSON.stringify({
+    name: name,
+    phone: phone
+  }));
+
+  alert("Booking Confirmed!\nYour Booking ID: " + slotId);
+  showSlots();
+}
+</script>
 
 </body>
 </html>
