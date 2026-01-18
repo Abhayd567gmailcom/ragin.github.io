@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Vishak Beauty Salon</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body {
   margin: 0;
@@ -13,14 +11,12 @@ body {
   background: #fff;
   color: #333;
 }
-
 header {
   background: linear-gradient(to right, #e91e63, #f48fb1);
   color: white;
   padding: 30px;
   text-align: center;
 }
-
 .hero {
   background: url("images/hero.jpg") center/cover no-repeat;
   height: 70vh;
@@ -28,67 +24,56 @@ header {
   align-items: center;
   justify-content: center;
 }
-
 .hero-box {
   background: rgba(255,255,255,0.9);
   padding: 30px;
   border-radius: 15px;
   text-align: center;
 }
-
 section {
   padding: 50px 20px;
 }
-
 .services {
   background: #f9f9f9;
 }
-
 .service-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
   gap: 20px;
 }
-
 .service-card {
   background: white;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-
 .service-card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
 }
-
 .service-card h3 {
   margin: 0;
   padding: 15px;
   background: #e91e63;
   color: white;
 }
-
 .booking {
   background: linear-gradient(to bottom, #fff0f6, #ffffff);
 }
-
 .booking-form {
-  max-width: 650px;
+  max-width: 900px;
   margin: auto;
   background: white;
   padding: 30px;
   border-radius: 20px;
   box-shadow: 0 6px 25px rgba(0,0,0,0.15);
 }
-
 input, select, button {
   width: 100%;
   padding: 10px;
   margin: 8px 0 15px;
 }
-
 button {
   background: #e91e63;
   color: white;
@@ -96,26 +81,27 @@ button {
   border-radius: 8px;
   cursor: pointer;
 }
-
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
 .slot {
+  padding: 10px;
+  background: #e8f5e9;
+  border-radius: 5px;
   display: flex;
-  gap: 15px;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 10px;
+  justify-content: space-between;
   align-items: center;
 }
-
-.slot img {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  object-fit: cover;
+.booked {
+  background: #fdecea;
 }
-
-.available { background: #e8f5e9; }
-.booked { background: #fdecea; }
-
+.slot button {
+  width: auto;
+  padding: 5px 10px;
+}
 footer {
   background: #222;
   color: white;
@@ -123,7 +109,6 @@ footer {
   padding: 15px;
 }
 </style>
-
 </head>
 
 <body>
@@ -142,7 +127,6 @@ footer {
 
 <section class="services">
   <h2 style="text-align:center">Our Services</h2>
-
   <div class="service-grid">
     <div class="service-card">
       <img src="images/salon1.jpg">
@@ -161,91 +145,82 @@ footer {
 
 <section class="booking">
   <h2 style="text-align:center">Book Your Appointment</h2>
-
   <div class="booking-form">
     <label>Name</label>
-    <input id="name">
+    <input id="name" placeholder="Your Name">
+    <label>Phone</label>
+    <input id="phone" placeholder="Phone Number">
+    <label>Service</label>
+    <select id="service">
+      <option value="Haircut">Haircut / Beard</option>
+      <option value="Facial">Facial</option>
+      <option value="Bridal">Bridal Makeup</option>
+    </select>
+    <label>Date</label>
+    <input type="date" id="date">
+    <button onclick="loadSlots()">Show Slots</button>
 
-```
-<label>Phone</label>
-<input id="phone">
-
-<label>Service</label>
-<select id="service">
-  <option value="Haircut">Haircut / Beard</option>
-  <option value="Facial">Facial</option>
-</select>
-
-<label>Date</label>
-<input type="date" id="date">
-
-<button onclick="showSlots()">Show Available Slots</button>
-<div id="slots"></div>
-```
-
+    <h2>Available Slots</h2>
+    <div id="slots" class="slots"></div>
   </div>
 </section>
 
-<footer>© 2026 Vishak Beauty Salon</footer>
+<footer>
+  © 2026 Vishak Beauty Salon
+</footer>
 
 <script>
-const START = 8;
-const END = 20;
-const PROFESSIONALS = 6;
-const API_URL = "https://script.google.com/macros/s/AKfycbw40esbuf8f2s9HUrwtAwmH-KFQBOC2ye0OqoiSY0PpxJCS-bT89EFxXpXUmREZkm4z/exec";
+const START=8;
+const END=20;
+const PROFESSIONALS=6;
+const API_URL="https://script.google.com/macros/s/AKfycbxhzr6sEPu2ot_Sn8vTK0op0OpyoIhbpz-6WhLxoLOe44kqNt6yH9RfQE0GuY-X0ch-lA/exec";
 
-function showSlots() {
-  const slots = document.getElementById("slots");
-  slots.innerHTML = "";
+// Load slots for the selected date
+function loadSlots(){
+  const slotsDiv=document.getElementById("slots");
+  slotsDiv.innerHTML="";
+  const date=document.getElementById("date").value;
+  if(!date){ alert("Select a date"); return; }
 
-  const service = document.getElementById("service").value;
-  const img = service === "Facial" ? "images/facial.jpg" : "images/salon2.jpg";
+  fetch(`${API_URL}?action=getSlots&date=${date}`)
+    .then(res=>res.json())
+    .then(bookedSlots=>{
+      for(let hour=START; hour<END; hour++){
+        for(let p=1;p<=PROFESSIONALS;p++){
+          const slotId=`${hour}:00-${hour+1}:00_Pro${p}`;
+          const isBooked=bookedSlots.includes(slotId);
 
-  for (let hour = START; hour < END; hour++) {
-    for (let p = 1; p <= PROFESSIONALS; p++) {
-
-      const div = document.createElement("div");
-      div.className = "slot available";
-
-      div.innerHTML = `
-        <img src="${img}">
-        <div>
-          🕒 ${hour}:00 – ${hour+1}:00<br>
-          👩‍🔧 Professional ${p}<br>
-          <button onclick="bookSlot('${hour}:00-${hour+1}:00','Professional ${p}')">Book</button>
-        </div>
-      `;
-      slots.appendChild(div);
-    }
-  }
+          const div=document.createElement("div");
+          div.className="slot"+(isBooked?" booked":"");
+          div.id=slotId;
+          div.innerHTML=`<span>${hour}:00-${hour+1}:00 | Professional ${p}</span>
+            <button ${isBooked?'disabled':''} onclick="bookSlot('${hour}:00-${hour+1}:00','Pro${p}')">${isBooked?'Booked':'Book'}</button>`;
+          slotsDiv.appendChild(div);
+        }
+      }
+    })
+    .catch(()=>alert("Failed to load slots"));
 }
 
-function bookSlot(slot, professional) {
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const date = document.getElementById("date").value;
-  const service = document.getElementById("service").value;
+// Book a slot
+function bookSlot(slotTime, professional){
+  const name=document.getElementById("name").value;
+  const phone=document.getElementById("phone").value;
+  const service=document.getElementById("service").value;
+  const date=document.getElementById("date").value;
+  if(!name||!phone||!date){ alert("Fill all details"); return; }
 
-  if (!name || !phone || !date) {
-    alert("Please fill all details");
-    return;
-  }
-
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name,
-      phone,
-      service,
-      date,
-      slot,
-      professional
-    })
+  fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({name,phone,service,date,slot:slotTime,professional})
   })
-  .then(res => res.json())
-  .then(data => alert(data.message))
-  .catch(() => alert("Booking failed"));
+  .then(res=>res.json())
+  .then(data=>{
+    alert(data.message);
+    if(data.success) loadSlots(); // Refresh to reflect booked slots
+  })
+  .catch(()=>alert("Booking failed"));
 }
 </script>
 
