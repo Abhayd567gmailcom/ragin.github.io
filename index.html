@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -112,13 +113,8 @@ button {
   object-fit: cover;
 }
 
-.available {
-  background: #e8f5e9;
-}
-
-.booked {
-  background: #fdecea;
-}
+.available { background: #e8f5e9; }
+.booked { background: #fdecea; }
 
 footer {
   background: #222;
@@ -127,6 +123,7 @@ footer {
   padding: 15px;
 }
 </style>
+
 </head>
 
 <body>
@@ -151,12 +148,10 @@ footer {
       <img src="images/salon1.jpg">
       <h3>Haircut & Beard (30 mins)</h3>
     </div>
-
     <div class="service-card">
       <img src="images/facial.jpg">
       <h3>Facials & Skin Care (2 hours)</h3>
     </div>
-
     <div class="service-card">
       <img src="images/bridal.jpg">
       <h3>Bridal Makeup</h3>
@@ -171,111 +166,88 @@ footer {
     <label>Name</label>
     <input id="name">
 
-    <label>Phone</label>
-    <input id="phone">
+```
+<label>Phone</label>
+<input id="phone">
 
-    <label>Service</label>
-    <select id="service">
-      <option value="hair">Haircut / Beard</option>
-      <option value="facial">Facial</option>
-    </select>
+<label>Service</label>
+<select id="service">
+  <option value="Haircut">Haircut / Beard</option>
+  <option value="Facial">Facial</option>
+</select>
 
-    <label>Date</label>
-    <input type="date" id="date">
+<label>Date</label>
+<input type="date" id="date">
 
-    <button onclick="showSlots()">Show Available Slots</button>
+<button onclick="showSlots()">Show Available Slots</button>
+<div id="slots"></div>
+```
 
-    <div id="slots"></div>
   </div>
 </section>
 
-<footer>
-  © 2026 Vishak Beauty Salon
-</footer>
+<footer>© 2026 Vishak Beauty Salon</footer>
 
 <script>
 const START = 8;
 const END = 20;
 const PROFESSIONALS = 6;
+const API_URL = "https://script.google.com/macros/s/AKfycbw40esbuf8f2s9HUrwtAwmH-KFQBOC2ye0OqoiSY0PpxJCS-bT89EFxXpXUmREZkm4z/exec";
 
 function showSlots() {
   const slots = document.getElementById("slots");
   slots.innerHTML = "";
 
   const service = document.getElementById("service").value;
-  const img =
-    service === "facial"
-      ? "images/facial.jpg"
-      : "images/salon2.jpg";
+  const img = service === "Facial" ? "images/facial.jpg" : "images/salon2.jpg";
 
   for (let hour = START; hour < END; hour++) {
     for (let p = 1; p <= PROFESSIONALS; p++) {
 
-      const slotId = hour + "-" + p;
-      const booked = localStorage.getItem(slotId);
-
       const div = document.createElement("div");
-      div.className = "slot " + (booked ? "booked" : "available");
+      div.className = "slot available";
 
-      if (booked) {
-        div.innerHTML = `
-          <img src="${img}">
-          <div>
-            ⛔ Booked<br>
-            Booking ID: <b>${slotId}</b>
-          </div>`;
-      } else {
-        div.innerHTML = `
-          <img src="${img}">
-          <div>
-            ✅ ${hour}:00 – ${hour + 1}:00<br>
-            Professional ${p}<br>
-            <button onclick="book('${slotId}')">Book</button>
-          </div>`;
-      }
-
+      div.innerHTML = `
+        <img src="${img}">
+        <div>
+          🕒 ${hour}:00 – ${hour+1}:00<br>
+          👩‍🔧 Professional ${p}<br>
+          <button onclick="bookSlot('${hour}:00-${hour+1}:00','Professional ${p}')">Book</button>
+        </div>
+      `;
       slots.appendChild(div);
     }
   }
 }
 
-function book(slotId) {
+function bookSlot(slot, professional) {
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
+  const date = document.getElementById("date").value;
+  const service = document.getElementById("service").value;
 
-  if (!name || !phone) {
-    alert("Please enter name and phone");
+  if (!name || !phone || !date) {
+    alert("Please fill all details");
     return;
   }
 
-  localStorage.setItem(slotId, JSON.stringify({ name, phone }));
-  alert("Booking Confirmed!\nYour Booking ID: " + slotId);
-  showSlots();
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      phone,
+      service,
+      date,
+      slot,
+      professional
+    })
+  })
+  .then(res => res.json())
+  .then(data => alert(data.message))
+  .catch(() => alert("Booking failed"));
 }
 </script>
 
 </body>
 </html>
-
-
-<script>
-function bookSlot() {
-  fetch("PASTE_WEB_APP_URL_HERE", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      date: "2026-01-22",
-      slot: "10:00-10:30",
-      professional: "Pro2",
-      userName: "Abhaydev"
-    })
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message))
-  .catch(err => alert("Error booking slot"));
-}
-</script>
-
-<button onclick="bookSlot()">Book Slot</button>
