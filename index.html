@@ -256,3 +256,26 @@ function book(slotId) {
 
 </body>
 </html>
+
+
+<script>
+function bookSlot() {
+  fetch("PASTE_WEB_APP_URL_HERE", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      date: "2026-01-22",
+      slot: "10:00-10:30",
+      professional: "Pro2",
+      userName: "Abhaydev"
+    })
+  })
+  .then(res => res.json())
+  .then(data => alert(data.message))
+  .catch(err => alert("Error booking slot"));
+}
+</script>
+
+<button onclick="bookSlot()">Book Slot</button>
